@@ -1,0 +1,102 @@
+@extends('layouts.app')
+
+@section('content')
+<h1>{{ $catch->species }}</h1>
+
+{{-- Catch Photo --}}
+@if($catch->photo_path)
+    <img src="{{ asset('storage/' . $catch->photo_path) }}" class="img-fluid mb-3 rounded">
+@endif
+
+{{-- Catch Details --}}
+<ul class="list-group mb-3">
+    <li class="list-group-item">
+        <strong>Weight:</strong> {{ $catch->weight_kg ?? 'N/A' }} kg
+    </li>
+    <li class="list-group-item">
+        <strong>Length:</strong> {{ $catch->length_cm ?? 'N/A' }} cm
+    </li>
+    <li class="list-group-item">
+        <strong>Depth:</strong> {{ $catch->depth_m ?? 'N/A' }} m
+    </li>
+    <li class="list-group-item">
+        <strong>Visibility:</strong> {{ ucfirst($catch->visibility) }}
+    </li>
+    @if($catch->fishingSpot)
+        <li class="list-group-item">
+            <strong>Fishing Spot:</strong> {{ $catch->fishingSpot->name }}
+        </li>
+    @endif
+</ul>
+
+{{-- Notes --}}
+@if($catch->notes)
+    <p><strong>Notes:</strong><br>{{ $catch->notes }}</p>
+@endif
+
+<p class="text-muted">
+    Logged by {{ $catch->user->name }}
+    on {{ $catch->created_at->format('d M Y') }}
+</p>
+
+<div class="mb-4">
+    <a href="{{ route('catches.edit', $catch) }}" class="btn btn-secondary">Edit</a>
+    <a href="{{ route('catches.index') }}" class="btn btn-primary">Back to Catches</a>
+</div>
+
+<hr>
+
+{{-- ================= COMMENTS SECTION ================= --}}
+
+<h4>Comments</h4>
+
+{{-- Existing Comments --}}
+@if($catch->comments->count())
+    <ul class="list-group mb-3">
+        @foreach($catch->comments as $comment)
+            <li class="list-group-item">
+                <strong>{{ $comment->user->name }}</strong>
+                <span class="text-muted small">
+                    • {{ $comment->created_at->diffForHumans() }}
+                </span>
+
+                <p class="mb-1 mt-1">{{ $comment->content }}</p>
+
+                @auth
+                    @if(auth()->id() === $comment->user_id)
+                        <form action="{{ route('comments.destroy', $comment) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-link text-danger p-0">
+                                Delete
+                            </button>
+                        </form>
+                    @endif
+                @endauth
+            </li>
+        @endforeach
+    </ul>
+@else
+    <p class="text-muted">No comments yet.</p>
+@endif
+
+{{-- Add Comment --}}
+@auth
+<form action="{{ route('comments.store') }}" method="POST">
+    @csrf
+    <input type="hidden" name="catch_log_id" value="{{ $catch->id }}">
+
+    <div class="mb-3">
+        <label class="form-label">Add a comment</label>
+        <textarea name="content" class="form-control" rows="2" required></textarea>
+    </div>
+
+    <button class="btn btn-primary btn-sm">Post Comment</button>
+</form>
+@else
+<p>
+    <a href="{{ route('login') }}">Login</a> to comment.
+</p>
+@endauth
+
+@endsection
