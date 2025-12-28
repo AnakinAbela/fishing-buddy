@@ -94,6 +94,21 @@
     </span>
 </div>
 
+{{-- Weather / Conditions (placeholder) --}}
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-2">Weather snapshot</h5>
+        @if($catch->fishingSpot)
+            <p class="mb-1 text-muted small">
+                Spot: {{ $catch->fishingSpot->name }}
+                ({{ number_format($catch->fishingSpot->latitude, 2) }}, {{ number_format($catch->fishingSpot->longitude, 2) }})
+            </p>
+        @endif
+        <p class="mb-1">Live weather integration coming soon.</p>
+        <p class="mb-0 text-muted small">Plan: fetch wind/wave conditions for each spot to help choose when to fish.</p>
+    </div>
+</div>
+
 <h4>Comments</h4>
 
 {{-- Existing Comments --}}
