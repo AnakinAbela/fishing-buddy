@@ -20,7 +20,15 @@ class CatchLogController extends Controller
     public function index()
     {
         $sort = request('sort', 'latest');
+        $filter = request('filter', 'all');
         $query = CatchLog::with('user', 'fishingSpot');
+
+        if ($filter === 'mine' && Auth::check()) {
+            $query->where('user_id', Auth::id());
+        } elseif ($filter === 'friends' && Auth::check()) {
+            $friendIds = Auth::user()->following()->pluck('users.id');
+            $query->whereIn('user_id', $friendIds);
+        }
 
         if ($sort === 'heaviest') {
             $query->orderByDesc('weight_kg');

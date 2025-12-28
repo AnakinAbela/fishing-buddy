@@ -15,6 +15,14 @@
             <option value="longest" {{ request('sort')==='longest' ? 'selected' : '' }}>Longest</option>
         </select>
     </div>
+    <div class="col-sm-4 col-md-3">
+        <label class="form-label mb-1">Filter</label>
+        <select name="filter" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="all" {{ request('filter','all')==='all' ? 'selected' : '' }}>All catches</option>
+            <option value="mine" {{ request('filter')==='mine' ? 'selected' : '' }}>My catches</option>
+            <option value="friends" {{ request('filter')==='friends' ? 'selected' : '' }}>Friends</option>
+        </select>
+    </div>
 </form>
 
 @if($catches->count())

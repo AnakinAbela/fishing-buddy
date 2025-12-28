@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\FishingSpot;
 use App\Models\CatchLog;
 use App\Models\Comment;
+use App\Models\Follow;
 
 class DemoSeeder extends Seeder
 {
@@ -75,6 +76,17 @@ class DemoSeeder extends Seeder
             'user_id' => $demo->id,
             'catch_log_id' => $catchB->id,
             'content' => 'Great trout spot!',
+        ]);
+
+        // Basic follow relationships so "Friends" filter shows data
+        Follow::create([
+            'follower_id' => $demo->id,
+            'followed_id' => $friend->id,
+        ]);
+
+        Follow::create([
+            'follower_id' => $friend->id,
+            'followed_id' => $demo->id,
         ]);
     }
 }
