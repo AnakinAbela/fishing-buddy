@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FishingSpot;
+use App\Rules\ValidCoordinates;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,8 +26,8 @@ class FishingSpotController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
+            'latitude' => ['required','numeric','between:-90,90', new ValidCoordinates],
+            'longitude' => ['required','numeric','between:-180,180', new ValidCoordinates],
         ]);
 
         $data['user_id'] = Auth::id();
@@ -53,8 +54,8 @@ class FishingSpotController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
+            'latitude' => ['required','numeric','between:-90,90', new ValidCoordinates],
+            'longitude' => ['required','numeric','between:-180,180', new ValidCoordinates],
         ]);
 
         $spot->update($data);

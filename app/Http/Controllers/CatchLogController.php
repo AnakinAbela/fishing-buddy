@@ -19,7 +19,18 @@ class CatchLogController extends Controller
 
     public function index()
     {
-        $catches = CatchLog::with('user', 'fishingSpot')->paginate(10);
+        $sort = request('sort', 'latest');
+        $query = CatchLog::with('user', 'fishingSpot');
+
+        if ($sort === 'heaviest') {
+            $query->orderByDesc('weight_kg');
+        } elseif ($sort === 'longest') {
+            $query->orderByDesc('length_cm');
+        } else {
+            $query->latest();
+        }
+
+        $catches = $query->paginate(10)->withQueryString();
         return view('catches.index', compact('catches'));
     }
 

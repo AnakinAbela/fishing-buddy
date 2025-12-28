@@ -6,6 +6,17 @@
     <a href="{{ route('catches.create') }}" class="btn btn-primary">Log New Catch</a>
 </div>
 
+<form method="GET" class="row g-2 align-items-end mb-3">
+    <div class="col-sm-4 col-md-3">
+        <label class="form-label mb-1">Sort by</label>
+        <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="latest" {{ request('sort','latest')==='latest' ? 'selected' : '' }}>Newest</option>
+            <option value="heaviest" {{ request('sort')==='heaviest' ? 'selected' : '' }}>Heaviest</option>
+            <option value="longest" {{ request('sort')==='longest' ? 'selected' : '' }}>Longest</option>
+        </select>
+    </div>
+</form>
+
 @if($catches->count())
     <div class="row row-cols-1 row-cols-md-2 g-4">
         @foreach($catches as $catch)
