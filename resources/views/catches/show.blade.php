@@ -66,7 +66,9 @@
 </div>
 
 <div class="mb-4">
-    <a href="{{ route('catches.edit', $catch) }}" class="btn btn-secondary">Edit</a>
+    @can('update', $catch)
+        <a href="{{ route('catches.edit', $catch) }}" class="btn btn-secondary">Edit</a>
+    @endcan
     <a href="{{ route('catches.index') }}" class="btn btn-primary">Back to Catches</a>
 </div>
 

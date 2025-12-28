@@ -8,11 +8,15 @@
 <p><strong>Longitude:</strong> {{ $spot->longitude }}</p>
 <p><small class="text-muted">Added by {{ $spot->user->name }} on {{ $spot->created_at->format('d M Y') }}</small></p>
 
-<a href="{{ route('spots.edit', $spot) }}" class="btn btn-secondary">Edit</a>
-<form action="{{ route('spots.destroy', $spot) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Delete this spot?');">
-    @csrf
-    @method('DELETE')
-    <button class="btn btn-danger">Delete</button>
-</form>
+@can('update', $spot)
+    <a href="{{ route('spots.edit', $spot) }}" class="btn btn-secondary">Edit</a>
+@endcan
+@can('delete', $spot)
+    <form action="{{ route('spots.destroy', $spot) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Delete this spot?');">
+        @csrf
+        @method('DELETE')
+        <button class="btn btn-danger">Delete</button>
+    </form>
+@endcan
 <a href="{{ route('spots.index') }}" class="btn btn-primary">Back to Spots</a>
 @endsection

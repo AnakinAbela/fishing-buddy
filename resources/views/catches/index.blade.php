@@ -53,14 +53,19 @@
                         </p>
 
                         <a href="{{ route('catches.show', $catch) }}" class="btn btn-sm btn-outline-primary">View</a>
-                        <a href="{{ route('catches.edit', $catch) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
 
-                        <form action="{{ route('catches.destroy', $catch) }}" method="POST" class="d-inline-block"
-                              onsubmit="return confirm('Delete this catch?');">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger">Delete</button>
-                        </form>
+                        @can('update', $catch)
+                            <a href="{{ route('catches.edit', $catch) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        @endcan
+
+                        @can('delete', $catch)
+                            <form action="{{ route('catches.destroy', $catch) }}" method="POST" class="d-inline-block"
+                                  onsubmit="return confirm('Delete this catch?');">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        @endcan
                     </div>
                 </div>
             </div>

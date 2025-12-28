@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('spots', FishingSpotController::class);
     Route::resource('catches', CatchLogController::class);
     Route::post('comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
     Route::post('likes/{catch}', [LikeController::class, 'toggle'])->name('likes.toggle');
     Route::post('follow/{user}', [FollowController::class, 'toggle'])->name('follow.toggle');
 });
