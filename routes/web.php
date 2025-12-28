@@ -18,6 +18,10 @@ use App\Http\Controllers\FollowController;
 |
 */
 
+Route::get('/', function () {
+    return redirect()->route('catches.index');
+});
+
 Route::resource('spots', FishingSpotController::class);
 Route::resource('catches', CatchLogController::class);
 Route::post('comments', [CommentController::class, 'store'])->name('comments.store');
