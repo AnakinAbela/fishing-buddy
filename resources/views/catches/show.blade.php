@@ -39,6 +39,32 @@
     on {{ $catch->created_at->format('d M Y') }}
 </p>
 
+@php
+    $author = $catch->user;
+    $isOwner = auth()->check() && auth()->id() === $author->id;
+    $followerCount = $author->followers->count();
+    $userFollowsAuthor = auth()->check() && $author->followers->contains('id', auth()->id());
+@endphp
+
+<div class="d-flex align-items-center flex-wrap gap-2 mb-3">
+    <span class="text-muted small">
+        {{ $followerCount }} {{ $followerCount === 1 ? 'follower' : 'followers' }}
+    </span>
+
+    @auth
+        @if(!$isOwner)
+            <form action="{{ route('follow.toggle', $author) }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-sm {{ $userFollowsAuthor ? 'btn-success' : 'btn-outline-success' }}">
+                    {{ $userFollowsAuthor ? 'Unfollow' : 'Follow' }}
+                </button>
+            </form>
+        @endif
+    @else
+        <a href="{{ route('login') }}" class="btn btn-sm btn-outline-success">Login to follow</a>
+    @endauth
+</div>
+
 <div class="mb-4">
     <a href="{{ route('catches.edit', $catch) }}" class="btn btn-secondary">Edit</a>
     <a href="{{ route('catches.index') }}" class="btn btn-primary">Back to Catches</a>
