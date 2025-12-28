@@ -27,3 +27,12 @@ Route::resource('catches', CatchLogController::class);
 Route::post('comments', [CommentController::class, 'store'])->name('comments.store');
 Route::post('likes/{catch}', [LikeController::class, 'toggle'])->name('likes.toggle');
 Route::post('follow/{user}', [FollowController::class, 'toggle'])->name('follow.toggle');
+
+// Simple login/logout placeholders for demo (no auth scaffolding installed)
+Route::view('/login', 'auth.login')->name('login');
+Route::post('/logout', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('catches.index');
+})->name('logout');
