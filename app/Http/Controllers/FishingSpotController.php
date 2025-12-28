@@ -10,6 +10,8 @@ class FishingSpotController extends Controller
 {
     public function index()
     {
+        $spots = FishingSpot::with('user')->paginate(10);
+
         return view('fishing_spots.index', compact('spots'));
     }
 
