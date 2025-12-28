@@ -1,11 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\FishingSpotController;
 use App\Http\Controllers\CatchLogController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,20 +21,19 @@ use App\Http\Controllers\FollowController;
 */
 
 Route::get('/', function () {
-    return redirect()->route('catches.index');
+    return Auth::check()
+        ? redirect()->route('catches.index')
+        : redirect()->route('login');
 });
 
-Route::resource('spots', FishingSpotController::class);
-Route::resource('catches', CatchLogController::class);
-Route::post('comments', [CommentController::class, 'store'])->name('comments.store');
-Route::post('likes/{catch}', [LikeController::class, 'toggle'])->name('likes.toggle');
-Route::post('follow/{user}', [FollowController::class, 'toggle'])->name('follow.toggle');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Simple login/logout placeholders for demo (no auth scaffolding installed)
-Route::view('/login', 'auth.login')->name('login');
-Route::post('/logout', function () {
-    auth()->logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect()->route('catches.index');
-})->name('logout');
+Route::middleware('auth')->group(function () {
+    Route::resource('spots', FishingSpotController::class);
+    Route::resource('catches', CatchLogController::class);
+    Route::post('comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('likes/{catch}', [LikeController::class, 'toggle'])->name('likes.toggle');
+    Route::post('follow/{user}', [FollowController::class, 'toggle'])->name('follow.toggle');
+});
