@@ -55,7 +55,7 @@
         const mapContainer = document.getElementById('map');
         const latInput = document.getElementById('latitude');
         const lngInput = document.getElementById('longitude');
-        const mapKey = "{{ config('services.maptiler.key') }}";
+        const mapKey = "{{ env('MAPTILER_KEY') ?? config('services.maptiler.key') }}";
 
         if (typeof L === 'undefined' || !mapKey) {
             mapContainer.innerHTML = '<div class="alert alert-warning m-0">Map unavailable. Enter latitude/longitude manually.</div>';
@@ -65,9 +65,18 @@
         const startLat = {{ old('latitude', $spot->latitude ?? 35.9375) }};
         const startLng = {{ old('longitude', $spot->longitude ?? 14.3754) }};
         const map = L.map('map').setView([startLat, startLng], 10);
-        L.tileLayer(`https://api.maptiler.com/maps/streets/256/{z}/{x}/{y}.png?key=${mapKey}`, {
+        const mt = L.tileLayer(`https://api.maptiler.com/maps/streets/256/{z}/{x}/{y}.png?key=${mapKey}`, {
             attribution: '&copy; OpenStreetMap contributors & MapTiler'
         }).addTo(map);
+
+        let fallbackApplied = false;
+        mt.on('tileerror', () => {
+            if (fallbackApplied) return;
+            fallbackApplied = true;
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+        });
 
         let marker = L.marker([startLat, startLng]).addTo(map);
 
