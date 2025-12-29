@@ -37,8 +37,15 @@
 </form>
 
 @push('scripts')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-Xi8ejP2VZ88r1pOpL3PC3xAla0YTRS2dM7VZC8q64r8=" crossorigin="anonymous"/>
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-sA+zN2R0MSKhQkIYCFH31os5i09yG9UksEeCrvA4S6A=" crossorigin="anonymous" defer></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+    /* Minimal fallback if Leaflet CSS fails to load */
+    .leaflet-container { position: relative; outline: none; }
+    .leaflet-pane, .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow, .leaflet-tile-container, .leaflet-pane > svg, .leaflet-pane > canvas { position: absolute; left: 0; top: 0; }
+    .leaflet-container img { max-width: none !important; }
+    .leaflet-tile { width: 256px; height: 256px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <script>
     // Fallback loader if primary Leaflet CDN is blocked
     function loadLeafletBackup(callback) {
