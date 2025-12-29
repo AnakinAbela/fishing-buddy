@@ -4,8 +4,12 @@
 <h1>{{ $spot->name }}</h1>
 
 <p>{{ $spot->description ?? 'No description provided.' }}</p>
-<p><strong>Country:</strong> {{ $spot->country ?? 'N/A' }}</p>
-<p><strong>Town/City:</strong> {{ $spot->city ?? 'N/A' }}</p>
+@if($spot->country || $spot->city)
+    <p><strong>Country:</strong> {{ $spot->country ?? 'N/A' }}</p>
+    <p><strong>Town/City:</strong> {{ $spot->city ?? 'N/A' }}</p>
+@else
+    <p><strong>Location:</strong> Lat {{ $spot->latitude }}, Lng {{ $spot->longitude }}</p>
+@endif
 <p><small class="text-muted">Added by {{ $spot->user->name }} on {{ $spot->created_at->format('d M Y') }}</small></p>
 
 @can('update', $spot)
