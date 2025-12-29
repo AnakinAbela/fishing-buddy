@@ -39,6 +39,9 @@
                             {{ auth()->user()->name }}
                         </span>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('profile.show', auth()->user()) }}">Profile</a>
+                    </li>
 
                     <li class="nav-item">
                         <form action="{{ route('logout') }}" method="POST">
