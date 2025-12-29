@@ -40,51 +40,76 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-Xi8ejP2VZ88r1pOpL3PC3xAla0YTRS2dM7VZC8q64r8=" crossorigin="anonymous"/>
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-sA+zN2R0MSKhQkIYCFH31os5i09yG9UksEeCrvA4S6A=" crossorigin="anonymous" defer></script>
 <script>
+    // Fallback loader if primary Leaflet CDN is blocked
+    function loadLeafletBackup(callback) {
+        const s = document.createElement('script');
+        s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        s.crossOrigin = '';
+        s.onload = callback;
+        s.onerror = callback;
+        document.head.appendChild(s);
+    }
+</script>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
         const mapContainer = document.getElementById('map');
         const latInput = document.getElementById('latitude');
         const lngInput = document.getElementById('longitude');
+
         const mapKey = "{{ env('MAPTILER_KEY') ?? config('services.maptiler.key') }}";
 
-        if (typeof L === 'undefined' || !mapKey) {
-            mapContainer.innerHTML = '<div class="alert alert-warning m-0">Map unavailable. Enter latitude/longitude manually.</div>';
-            return;
-        }
-
-        const map = L.map('map').setView([35.9375, 14.3754], 8); // Default: Malta
-        const mt = L.tileLayer(`https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=${mapKey}`, {
-            attribution: '&copy; OpenStreetMap contributors & MapTiler'
-        }).addTo(map);
-
-        // Fallback to OSM tiles if MapTiler fails
-        let fallbackApplied = false;
-        mt.on('tileerror', () => {
-            if (fallbackApplied) return;
-            fallbackApplied = true;
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-        });
-
-        let marker = null;
-
-        function setMarker(lat, lng) {
-            if (marker) {
-                marker.setLatLng([lat, lng]);
-            } else {
-                marker = L.marker([lat, lng]).addTo(map);
+        function initMap() {
+            if (typeof L === 'undefined') {
+                mapContainer.innerHTML = '<div class="alert alert-warning m-0">Map unavailable. Enter latitude/longitude manually.</div>';
+                return;
             }
-            latInput.value = lat.toFixed(6);
-            lngInput.value = lng.toFixed(6);
+
+            const map = L.map('map').setView([35.9375, 14.3754], 8); // Default: Malta
+
+            let fallbackApplied = false;
+            if (mapKey) {
+                const mt = L.tileLayer(`https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=${mapKey}`, {
+                    attribution: '&copy; OpenStreetMap contributors & MapTiler'
+                }).addTo(map);
+                mt.on('tileerror', () => {
+                    if (fallbackApplied) return;
+                    fallbackApplied = true;
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(map);
+                });
+            } else {
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+            }
+
+            let marker = null;
+
+            function setMarker(lat, lng) {
+                if (marker) {
+                    marker.setLatLng([lat, lng]);
+                } else {
+                    marker = L.marker([lat, lng]).addTo(map);
+                }
+                latInput.value = lat.toFixed(6);
+                lngInput.value = lng.toFixed(6);
+            }
+
+            map.on('click', (e) => {
+                setMarker(e.latlng.lat, e.latlng.lng);
+            });
+
+            if (latInput.value && lngInput.value) {
+                setMarker(parseFloat(latInput.value), parseFloat(lngInput.value));
+                map.setView([parseFloat(latInput.value), parseFloat(lngInput.value)], 12);
+            }
         }
 
-        map.on('click', (e) => {
-            setMarker(e.latlng.lat, e.latlng.lng);
-        });
-
-        if (latInput.value && lngInput.value) {
-            setMarker(parseFloat(latInput.value), parseFloat(lngInput.value));
-            map.setView([parseFloat(latInput.value), parseFloat(lngInput.value)], 12);
+        if (typeof L === 'undefined') {
+            loadLeafletBackup(initMap);
+        } else {
+            initMap();
         }
     });
 </script>
