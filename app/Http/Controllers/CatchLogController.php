@@ -44,7 +44,7 @@ class CatchLogController extends Controller
 
     public function create()
     {
-        $spots = FishingSpot::all();
+        $spots = FishingSpot::where('user_id', Auth::id())->get();
         return view('catches.create', compact('spots'));
     }
 
@@ -87,7 +87,7 @@ class CatchLogController extends Controller
     public function edit(CatchLog $catch)
     {
         $this->authorize('update', $catch);
-        $spots = FishingSpot::all();
+        $spots = FishingSpot::where('user_id', Auth::id())->get();
         return view('catches.edit', compact('catch', 'spots'));
     }
 

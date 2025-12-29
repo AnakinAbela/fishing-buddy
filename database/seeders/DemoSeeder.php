@@ -32,16 +32,20 @@ class DemoSeeder extends Seeder
             'user_id' => $demo->id,
             'name' => 'Harbor Jetty',
             'description' => 'Rocky jetty with good dawn bites.',
-            'latitude' => 36.85,
-            'longitude' => -6.35,
+            'country' => 'Spain',
+            'city' => 'Cadiz',
+            'latitude' => null,
+            'longitude' => null,
         ]);
 
         $spot2 = FishingSpot::create([
             'user_id' => $friend->id,
             'name' => 'Lake Point',
             'description' => 'Shaded point, best at dusk.',
-            'latitude' => 45.42,
-            'longitude' => -75.69,
+            'country' => 'Canada',
+            'city' => 'Ottawa',
+            'latitude' => null,
+            'longitude' => null,
         ]);
 
         $catchA = CatchLog::create([

@@ -4,8 +4,8 @@
 <h1>{{ $spot->name }}</h1>
 
 <p>{{ $spot->description ?? 'No description provided.' }}</p>
-<p><strong>Latitude:</strong> {{ $spot->latitude }}</p>
-<p><strong>Longitude:</strong> {{ $spot->longitude }}</p>
+<p><strong>Country:</strong> {{ $spot->country ?? 'N/A' }}</p>
+<p><strong>Town/City:</strong> {{ $spot->city ?? 'N/A' }}</p>
 <p><small class="text-muted">Added by {{ $spot->user->name }} on {{ $spot->created_at->format('d M Y') }}</small></p>
 
 @can('update', $spot)

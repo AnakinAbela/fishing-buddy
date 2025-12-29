@@ -12,21 +12,71 @@
     </div>
 
     <div class="mb-3">
+        <label for="country" class="form-label">Country</label>
+        <select class="form-select" id="country" name="country" required></select>
+    </div>
+
+    <div class="mb-3">
+        <label for="city" class="form-label">Town/City</label>
+        <select class="form-select" id="city" name="city" required></select>
+    </div>
+
+    <div class="mb-3">
         <label for="description" class="form-label">Description (optional)</label>
         <textarea class="form-control" id="description" name="description">{{ old('description', $spot->description) }}</textarea>
-    </div>
-
-    <div class="mb-3">
-        <label for="latitude" class="form-label">Latitude</label>
-        <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" value="{{ old('latitude', $spot->latitude) }}" required>
-    </div>
-
-    <div class="mb-3">
-        <label for="longitude" class="form-label">Longitude</label>
-        <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" value="{{ old('longitude', $spot->longitude) }}" required>
     </div>
 
     <button type="submit" class="btn btn-primary">Update Spot</button>
     <a href="{{ route('spots.index') }}" class="btn btn-secondary">Cancel</a>
 </form>
+
+@push('scripts')
+<script>
+    const countrySelect = document.getElementById('country');
+    const citySelect = document.getElementById('city');
+    const currentCountry = @json(old('country', $spot->country));
+    const currentCity = @json(old('city', $spot->city));
+
+    async function loadCountries() {
+        try {
+            const res = await fetch('https://restcountries.com/v3.1/all');
+            const data = await res.json();
+            const sorted = data.sort((a,b) => a.name.common.localeCompare(b.name.common));
+            countrySelect.innerHTML = '<option value=\"\">Select a country</option>' + sorted.map(c => `<option value=\"${c.name.common}\" ${c.name.common === currentCountry ? 'selected' : ''}>${c.name.common}</option>`).join('');
+            if (currentCountry) {
+                await loadCities(currentCountry);
+            }
+        } catch (e) {
+            countrySelect.innerHTML = '<option value=\"\">Unable to load countries</option>';
+        }
+    }
+
+    async function loadCities(country) {
+        citySelect.innerHTML = '<option value=\"\">Loading...</option>';
+        try {
+            const res = await fetch('https://countriesnow.space/api/v0.1/countries/cities', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ country })
+            });
+            const data = await res.json();
+            if (data && data.data && Array.isArray(data.data)) {
+                citySelect.innerHTML = data.data.map(city => `<option value=\"${city}\" ${city === currentCity ? 'selected' : ''}>${city}</option>`).join('');
+            } else {
+                citySelect.innerHTML = '<option value=\"\">No cities found</option>';
+            }
+        } catch (e) {
+            citySelect.innerHTML = '<option value=\"\">Unable to load cities</option>';
+        }
+    }
+
+    countrySelect.addEventListener('change', (e) => {
+        const country = e.target.value;
+        if (country) loadCities(country);
+        else citySelect.innerHTML = '<option value=\"\">Select a country first</option>';
+    });
+
+    loadCountries();
+</script>
+@endpush
 @endsection

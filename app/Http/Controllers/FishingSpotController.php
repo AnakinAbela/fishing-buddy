@@ -25,9 +25,11 @@ class FishingSpotController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
+            'country' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'latitude' => ['required','numeric','between:-90,90', new ValidCoordinates],
-            'longitude' => ['required','numeric','between:-180,180', new ValidCoordinates],
+            'latitude' => ['nullable','numeric','between:-90,90'],
+            'longitude' => ['nullable','numeric','between:-180,180'],
         ]);
 
         $data['user_id'] = Auth::id();
@@ -53,9 +55,11 @@ class FishingSpotController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
+            'country' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'latitude' => ['required','numeric','between:-90,90', new ValidCoordinates],
-            'longitude' => ['required','numeric','between:-180,180', new ValidCoordinates],
+            'latitude' => ['nullable','numeric','between:-90,90'],
+            'longitude' => ['nullable','numeric','between:-180,180'],
         ]);
 
         $spot->update($data);
