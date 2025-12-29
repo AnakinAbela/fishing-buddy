@@ -13,12 +13,12 @@
 
     <div class="mb-3">
         <label for="country" class="form-label">Country</label>
-        <select class="form-select" id="country" name="country" required></select>
+        <input type="text" class="form-control" id="country" name="country" value="{{ old('country', $spot->country) }}">
     </div>
 
     <div class="mb-3">
         <label for="city" class="form-label">Town/City</label>
-        <select class="form-select" id="city" name="city" required></select>
+        <input type="text" class="form-control" id="city" name="city" value="{{ old('city', $spot->city) }}">
     </div>
 
     <div class="mb-3">
@@ -26,57 +26,49 @@
         <textarea class="form-control" id="description" name="description">{{ old('description', $spot->description) }}</textarea>
     </div>
 
+    <div class="mb-3">
+        <label class="form-label">Pin location</label>
+        <div id="map" style="height: 300px;"></div>
+        <div class="form-text">Click the map to move the pin. Lat/Long will fill below.</div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="latitude" class="form-label">Latitude</label>
+            <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" value="{{ old('latitude', $spot->latitude) }}" required readonly>
+        </div>
+        <div class="col-md-6">
+            <label for="longitude" class="form-label">Longitude</label>
+            <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" value="{{ old('longitude', $spot->longitude) }}" required readonly>
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-primary">Update Spot</button>
     <a href="{{ route('spots.index') }}" class="btn btn-secondary">Cancel</a>
 </form>
 
 @push('scripts')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC0=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kGStlL1r58u1G3S1tqkYOC3kP2JbKyNG2IeC4=" crossorigin=""></script>
 <script>
-    const countrySelect = document.getElementById('country');
-    const citySelect = document.getElementById('city');
-    const currentCountry = @json(old('country', $spot->country));
-    const currentCity = @json(old('city', $spot->city));
+    const map = L.map('map').setView([{{ old('latitude', $spot->latitude ?? 35.9375) }}, {{ old('longitude', $spot->longitude ?? 14.3754) }}], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-    async function loadCountries() {
-        try {
-            const res = await fetch('https://restcountries.com/v3.1/all');
-            const data = await res.json();
-            const sorted = data.sort((a,b) => a.name.common.localeCompare(b.name.common));
-            countrySelect.innerHTML = '<option value=\"\">Select a country</option>' + sorted.map(c => `<option value=\"${c.name.common}\" ${c.name.common === currentCountry ? 'selected' : ''}>${c.name.common}</option>`).join('');
-            if (currentCountry) {
-                await loadCities(currentCountry);
-            }
-        } catch (e) {
-            countrySelect.innerHTML = '<option value=\"\">Unable to load countries</option>';
-        }
+    let marker = L.marker([{{ old('latitude', $spot->latitude ?? 35.9375) }}, {{ old('longitude', $spot->longitude ?? 14.3754) }}]).addTo(map);
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+
+    function setMarker(lat, lng) {
+        marker.setLatLng([lat, lng]);
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
     }
 
-    async function loadCities(country) {
-        citySelect.innerHTML = '<option value=\"\">Loading...</option>';
-        try {
-            const res = await fetch('https://countriesnow.space/api/v0.1/countries/cities', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ country })
-            });
-            const data = await res.json();
-            if (data && data.data && Array.isArray(data.data)) {
-                citySelect.innerHTML = data.data.map(city => `<option value=\"${city}\" ${city === currentCity ? 'selected' : ''}>${city}</option>`).join('');
-            } else {
-                citySelect.innerHTML = '<option value=\"\">No cities found</option>';
-            }
-        } catch (e) {
-            citySelect.innerHTML = '<option value=\"\">Unable to load cities</option>';
-        }
-    }
-
-    countrySelect.addEventListener('change', (e) => {
-        const country = e.target.value;
-        if (country) loadCities(country);
-        else citySelect.innerHTML = '<option value=\"\">Select a country first</option>';
+    map.on('click', (e) => {
+        setMarker(e.latlng.lat, e.latlng.lng);
     });
-
-    loadCountries();
 </script>
 @endpush
 @endsection

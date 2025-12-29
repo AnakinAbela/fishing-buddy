@@ -11,18 +11,25 @@
     </div>
 
     <div class="mb-3">
-        <label for="country" class="form-label">Country</label>
-        <select class="form-select" id="country" name="country" required></select>
-    </div>
-
-    <div class="mb-3">
-        <label for="city" class="form-label">Town/City</label>
-        <select class="form-select" id="city" name="city" required></select>
-    </div>
-
-    <div class="mb-3">
         <label for="description" class="form-label">Description (optional)</label>
         <textarea class="form-control" id="description" name="description">{{ old('description') }}</textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Pin location</label>
+        <div id="map" style="height: 300px;"></div>
+        <div class="form-text">Click the map to drop a pin. Lat/Long will fill below.</div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="latitude" class="form-label">Latitude</label>
+            <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" value="{{ old('latitude') }}" required readonly>
+        </div>
+        <div class="col-md-6">
+            <label for="longitude" class="form-label">Longitude</label>
+            <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" value="{{ old('longitude') }}" required readonly>
+        </div>
     </div>
 
     <button type="submit" class="btn btn-primary">Create Spot</button>
@@ -30,47 +37,37 @@
 </form>
 
 @push('scripts')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC0=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kGStlL1r58u1G3S1tqkYOC3kP2JbKyNG2IeC4=" crossorigin=""></script>
 <script>
-    const countrySelect = document.getElementById('country');
-    const citySelect = document.getElementById('city');
+    const map = L.map('map').setView([35.9375, 14.3754], 8); // Default: Malta
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-    async function loadCountries() {
-        try {
-            const res = await fetch('https://restcountries.com/v3.1/all');
-            const data = await res.json();
-            const sorted = data.sort((a,b) => a.name.common.localeCompare(b.name.common));
-            countrySelect.innerHTML = '<option value=\"\">Select a country</option>' + sorted.map(c => `<option value=\"${c.name.common}\">${c.name.common}</option>`).join('');
-        } catch (e) {
-            countrySelect.innerHTML = '<option value=\"\">Unable to load countries</option>';
+    let marker = null;
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+
+    function setMarker(lat, lng) {
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng]).addTo(map);
         }
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
     }
 
-    async function loadCities(country) {
-        citySelect.innerHTML = '<option value=\"\">Loading...</option>';
-        try {
-            const res = await fetch('https://countriesnow.space/api/v0.1/countries/cities', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ country })
-            });
-            const data = await res.json();
-            if (data && data.data && Array.isArray(data.data)) {
-                citySelect.innerHTML = data.data.map(city => `<option value=\"${city}\">${city}</option>`).join('');
-            } else {
-                citySelect.innerHTML = '<option value=\"\">No cities found</option>';
-            }
-        } catch (e) {
-            citySelect.innerHTML = '<option value=\"\">Unable to load cities</option>';
-        }
-    }
-
-    countrySelect.addEventListener('change', (e) => {
-        const country = e.target.value;
-        if (country) loadCities(country);
-        else citySelect.innerHTML = '<option value=\"\">Select a country first</option>';
+    map.on('click', (e) => {
+        setMarker(e.latlng.lat, e.latlng.lng);
     });
 
-    loadCountries();
+    // If old values exist, drop a marker there
+    if (latInput.value && lngInput.value) {
+        setMarker(parseFloat(latInput.value), parseFloat(lngInput.value));
+        map.setView([parseFloat(latInput.value), parseFloat(lngInput.value)], 12);
+    }
 </script>
 @endpush
 @endsection
