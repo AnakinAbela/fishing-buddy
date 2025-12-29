@@ -34,8 +34,8 @@ class DemoSeeder extends Seeder
             'description' => 'Rocky jetty with good dawn bites.',
             'country' => 'Spain',
             'city' => 'Cadiz',
-            'latitude' => null,
-            'longitude' => null,
+            'latitude' => 36.5299,
+            'longitude' => -6.2925,
         ]);
 
         $spot2 = FishingSpot::create([
@@ -44,8 +44,8 @@ class DemoSeeder extends Seeder
             'description' => 'Shaded point, best at dusk.',
             'country' => 'Canada',
             'city' => 'Ottawa',
-            'latitude' => null,
-            'longitude' => null,
+            'latitude' => 45.4215,
+            'longitude' => -75.6972,
         ]);
 
         $catchA = CatchLog::create([
