@@ -52,7 +52,7 @@
         }
 
         const map = L.map('map').setView([35.9375, 14.3754], 8); // Default: Malta
-        const mt = L.tileLayer(`https://api.maptiler.com/maps/streets/256/{z}/{x}/{y}.png?key=${mapKey}`, {
+        const mt = L.tileLayer(`https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=${mapKey}`, {
             attribution: '&copy; OpenStreetMap contributors & MapTiler'
         }).addTo(map);
 

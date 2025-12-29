@@ -65,7 +65,7 @@
         const startLat = {{ old('latitude', $spot->latitude ?? 35.9375) }};
         const startLng = {{ old('longitude', $spot->longitude ?? 14.3754) }};
         const map = L.map('map').setView([startLat, startLng], 10);
-        const mt = L.tileLayer(`https://api.maptiler.com/maps/streets/256/{z}/{x}/{y}.png?key=${mapKey}`, {
+        const mt = L.tileLayer(`https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=${mapKey}`, {
             attribution: '&copy; OpenStreetMap contributors & MapTiler'
         }).addTo(map);
 
