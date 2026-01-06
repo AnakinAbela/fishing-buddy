@@ -96,31 +96,13 @@
     </span>
 </div>
 
-{{-- Weather / Conditions --}}
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title mb-2">Weather snapshot</h5>
-        @if($catch->fishingSpot)
-            <p class="mb-1 text-muted small">
-                Spot: {{ $catch->fishingSpot->name }}
-                ({{ number_format($catch->fishingSpot->latitude, 2) }}, {{ number_format($catch->fishingSpot->longitude, 2) }})
-            </p>
-        @endif
-
-        @if(!empty($weather))
-            <p class="mb-1">Wind: {{ $weather['wind_speed'] ?? 'N/A' }} m/s
-                @if(!empty($weather['wind_direction']))
-                    ({{ round($weather['wind_direction']) }}°)
-                @endif
-            </p>
-            <p class="mb-1">Gusts: {{ $weather['wind_gusts'] ?? 'N/A' }} m/s</p>
-            <p class="mb-0">Temp: {{ $weather['temperature'] ?? 'N/A' }} °C</p>
-        @else
-            <p class="mb-1">Live weather unavailable right now.</p>
-            <p class="mb-0 text-muted small">Check again soon to see wind and temperature for this spot.</p>
-        @endif
+{{-- Location map --}}
+@if($catch->fishingSpot && $catch->fishingSpot->latitude && $catch->fishingSpot->longitude)
+    <div class="mb-4">
+        <label class="form-label d-block">Location</label>
+        <div id="catch-map" style="height: 300px;"></div>
     </div>
-</div>
+@endif
 
 <h4>Comments</h4>
 
@@ -174,3 +156,57 @@
 @endauth
 
 @endsection
+
+@if($catch->fishingSpot && $catch->fishingSpot->latitude && $catch->fishingSpot->longitude)
+@push('scripts')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+    .leaflet-container { position: relative; outline: none; }
+    .leaflet-pane, .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow, .leaflet-tile-container, .leaflet-pane > svg, .leaflet-pane > canvas { position: absolute; left: 0; top: 0; }
+    .leaflet-container img { max-width: none !important; }
+    .leaflet-tile { width: 256px; height: 256px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script>
+    function loadLeafletBackup(cb){
+        const s=document.createElement('script');
+        s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        s.onload=cb; s.onerror=cb; document.head.appendChild(s);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const mapKey = "{{ env('MAPTILER_KEY') ?? config('services.maptiler.key') }}";
+        const container = document.getElementById('catch-map');
+
+        function initMap(){
+            if (typeof L === 'undefined') {
+                container.innerHTML = '<div class="alert alert-warning m-0">Map unavailable.</div>';
+                return;
+            }
+            const lat = {{ $catch->fishingSpot->latitude }};
+            const lng = {{ $catch->fishingSpot->longitude }};
+            const map = L.map('catch-map').setView([lat, lng], 12);
+            let fallback=false;
+            if (mapKey) {
+                const mt = L.tileLayer(`https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=${mapKey}`, {
+                    attribution:'&copy; OpenStreetMap contributors & MapTiler'
+                }).addTo(map);
+                mt.on('tileerror', ()=> {
+                    if (fallback) return;
+                    fallback=true;
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
+                });
+            } else {
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
+            }
+            L.marker([lat, lng]).addTo(map);
+        }
+
+        if (typeof L === 'undefined') {
+            loadLeafletBackup(initMap);
+        } else {
+            initMap();
+        }
+    });
+</script>
+@endpush
+@endif

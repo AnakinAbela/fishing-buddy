@@ -4,19 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\CatchLog;
 use App\Models\FishingSpot;
-use App\Services\WeatherService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CatchLogController extends Controller
 {
-    private WeatherService $weather;
-
-    public function __construct(WeatherService $weather)
-    {
-        $this->weather = $weather;
-    }
-
     public function index()
     {
         $sort = request('sort', 'latest');
@@ -76,12 +68,7 @@ class CatchLogController extends Controller
     {
         $catch->load(['user.followers', 'fishingSpot', 'comments.user', 'likes']);
 
-        $weather = null;
-        if ($catch->fishingSpot && $catch->fishingSpot->latitude && $catch->fishingSpot->longitude) {
-            $weather = $this->weather->getCurrent($catch->fishingSpot->latitude, $catch->fishingSpot->longitude);
-        }
-
-        return view('catches.show', compact('catch', 'weather'));
+        return view('catches.show', compact('catch'));
     }
 
     public function edit(CatchLog $catch)
