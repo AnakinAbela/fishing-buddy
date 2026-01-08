@@ -4,10 +4,6 @@
 <h1>{{ $spot->name }}</h1>
 
 <p>{{ $spot->description ?? 'No description provided.' }}</p>
-@if($spot->country || $spot->city)
-    <p><strong>Country:</strong> {{ $spot->country ?? 'N/A' }}</p>
-    <p><strong>Town/City:</strong> {{ $spot->city ?? 'N/A' }}</p>
-@endif
 @if($spot->latitude && $spot->longitude)
     <div class="mb-3">
         <label class="form-label d-block">Pinned location</label>
