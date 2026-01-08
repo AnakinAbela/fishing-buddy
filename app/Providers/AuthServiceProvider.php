@@ -15,6 +15,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         \App\Models\CatchLog::class => \App\Policies\CatchLogPolicy::class,
         \App\Models\FishingSpot::class => \App\Policies\FishingSpotPolicy::class,
+        \App\Models\Comment::class => \App\Policies\CommentPolicy::class,
     ];
 
     /**
