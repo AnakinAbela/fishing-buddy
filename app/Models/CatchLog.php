@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class CatchLog extends Model
 {
@@ -13,6 +14,7 @@ class CatchLog extends Model
         'user_id',
         'fishing_spot_id',
         'species',
+        'slug',
         'weight_kg',
         'length_cm',
         'depth_m',
@@ -20,6 +22,20 @@ class CatchLog extends Model
         'visibility',
         'notes',
     ];
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($catch) {
+            if (empty($catch->slug)) {
+                $catch->slug = Str::slug($catch->species . '-' . Str::random(6));
+            }
+        });
+    }
 
     public function user(){
         return $this->belongsTo(User::class);
