@@ -52,6 +52,9 @@
             color: var(--foam);
             border-color: rgba(255,255,255,0.06);
         }
+        .text-muted, .small.text-muted {
+            color: rgba(230,242,241,0.7) !important;
+        }
         .btn-primary {
             background-color: var(--sun);
             border-color: var(--sun);
