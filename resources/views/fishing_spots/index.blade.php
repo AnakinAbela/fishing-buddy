@@ -20,12 +20,16 @@
                             </small>
                         </p>
                         <a href="{{ route('spots.show', $spot) }}" class="btn btn-sm btn-outline-primary">View</a>
-                        <a href="{{ route('spots.edit', $spot) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                        <form action="{{ route('spots.destroy', $spot) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Delete this spot?');">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
-                        </form>
+                        @can('update', $spot)
+                            <a href="{{ route('spots.edit', $spot) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        @endcan
+                        @can('delete', $spot)
+                            <form action="{{ route('spots.destroy', $spot) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Delete this spot?');">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                            </form>
+                        @endcan
                     </div>
                 </div>
             </div>

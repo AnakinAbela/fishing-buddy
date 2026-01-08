@@ -66,7 +66,9 @@
 </div>
 
 <div class="mb-4">
-    <a href="{{ route('catches.edit', $catch) }}" class="btn btn-secondary">Edit</a>
+    @can('update', $catch)
+        <a href="{{ route('catches.edit', $catch) }}" class="btn btn-secondary">Edit</a>
+    @endcan
     <a href="{{ route('catches.index') }}" class="btn btn-primary">Back to Catches</a>
 </div>
 
@@ -92,6 +94,32 @@
     <span class="text-muted small">
         {{ $likeCount }} {{ $likeCount === 1 ? 'like' : 'likes' }}
     </span>
+</div>
+
+{{-- Weather / Conditions --}}
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-2">Weather snapshot</h5>
+        @if($catch->fishingSpot)
+            <p class="mb-1 text-muted small">
+                Spot: {{ $catch->fishingSpot->name }}
+                ({{ number_format($catch->fishingSpot->latitude, 2) }}, {{ number_format($catch->fishingSpot->longitude, 2) }})
+            </p>
+        @endif
+
+        @if(!empty($weather))
+            <p class="mb-1">Wind: {{ $weather['wind_speed'] ?? 'N/A' }} m/s
+                @if(!empty($weather['wind_direction']))
+                    ({{ round($weather['wind_direction']) }}°)
+                @endif
+            </p>
+            <p class="mb-1">Gusts: {{ $weather['wind_gusts'] ?? 'N/A' }} m/s</p>
+            <p class="mb-0">Temp: {{ $weather['temperature'] ?? 'N/A' }} °C</p>
+        @else
+            <p class="mb-1">Live weather unavailable right now.</p>
+            <p class="mb-0 text-muted small">Check again soon to see wind and temperature for this spot.</p>
+        @endif
+    </div>
 </div>
 
 <h4>Comments</h4>

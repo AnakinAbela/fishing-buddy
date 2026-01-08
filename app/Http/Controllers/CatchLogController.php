@@ -4,14 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Models\CatchLog;
 use App\Models\FishingSpot;
+use App\Services\WeatherService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CatchLogController extends Controller
 {
+    private WeatherService $weather;
+
+    public function __construct(WeatherService $weather)
+    {
+        $this->weather = $weather;
+    }
+
     public function index()
     {
-        $catches = CatchLog::with('user', 'fishingSpot')->paginate(10);
+        $sort = request('sort', 'latest');
+        $filter = request('filter', 'all');
+        $query = CatchLog::with('user', 'fishingSpot');
+
+        if ($filter === 'mine' && Auth::check()) {
+            $query->where('user_id', Auth::id());
+        } elseif ($filter === 'friends' && Auth::check()) {
+            $friendIds = Auth::user()->following()->pluck('users.id');
+            $query->whereIn('user_id', $friendIds);
+        }
+
+        if ($sort === 'heaviest') {
+            $query->orderByDesc('weight_kg');
+        } elseif ($sort === 'longest') {
+            $query->orderByDesc('length_cm');
+        } else {
+            $query->latest();
+        }
+
+        $catches = $query->paginate(10)->withQueryString();
         return view('catches.index', compact('catches'));
     }
 
@@ -49,7 +76,12 @@ class CatchLogController extends Controller
     {
         $catch->load(['user.followers', 'fishingSpot', 'comments.user', 'likes']);
 
-        return view('catches.show', compact('catch'));
+        $weather = null;
+        if ($catch->fishingSpot && $catch->fishingSpot->latitude && $catch->fishingSpot->longitude) {
+            $weather = $this->weather->getCurrent($catch->fishingSpot->latitude, $catch->fishingSpot->longitude);
+        }
+
+        return view('catches.show', compact('catch', 'weather'));
     }
 
     public function edit(CatchLog $catch)

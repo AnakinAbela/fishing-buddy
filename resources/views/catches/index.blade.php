@@ -6,6 +6,25 @@
     <a href="{{ route('catches.create') }}" class="btn btn-primary">Log New Catch</a>
 </div>
 
+<form method="GET" class="row g-2 align-items-end mb-3">
+    <div class="col-sm-4 col-md-3">
+        <label class="form-label mb-1">Sort by</label>
+        <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="latest" {{ request('sort','latest')==='latest' ? 'selected' : '' }}>Newest</option>
+            <option value="heaviest" {{ request('sort')==='heaviest' ? 'selected' : '' }}>Heaviest</option>
+            <option value="longest" {{ request('sort')==='longest' ? 'selected' : '' }}>Longest</option>
+        </select>
+    </div>
+    <div class="col-sm-4 col-md-3">
+        <label class="form-label mb-1">Filter</label>
+        <select name="filter" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="all" {{ request('filter','all')==='all' ? 'selected' : '' }}>All catches</option>
+            <option value="mine" {{ request('filter')==='mine' ? 'selected' : '' }}>My catches</option>
+            <option value="friends" {{ request('filter')==='friends' ? 'selected' : '' }}>Friends</option>
+        </select>
+    </div>
+</form>
+
 @if($catches->count())
     <div class="row row-cols-1 row-cols-md-2 g-4">
         @foreach($catches as $catch)
@@ -34,14 +53,19 @@
                         </p>
 
                         <a href="{{ route('catches.show', $catch) }}" class="btn btn-sm btn-outline-primary">View</a>
-                        <a href="{{ route('catches.edit', $catch) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
 
-                        <form action="{{ route('catches.destroy', $catch) }}" method="POST" class="d-inline-block"
-                              onsubmit="return confirm('Delete this catch?');">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger">Delete</button>
-                        </form>
+                        @can('update', $catch)
+                            <a href="{{ route('catches.edit', $catch) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        @endcan
+
+                        @can('delete', $catch)
+                            <form action="{{ route('catches.destroy', $catch) }}" method="POST" class="d-inline-block"
+                                  onsubmit="return confirm('Delete this catch?');">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        @endcan
                     </div>
                 </div>
             </div>
