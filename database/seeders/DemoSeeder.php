@@ -24,58 +24,62 @@ class DemoSeeder extends Seeder
         $friend = User::create([
             'name' => 'Friend Fisher',
             'email' => 'friend@example.com',
-            'bio' => 'Shares catches with demo.',
+            'bio' => 'Regularly fishes the south coast.',
             'password' => Hash::make('password'),
         ]);
 
         $spot1 = FishingSpot::create([
             'user_id' => $demo->id,
-            'name' => 'Harbor Jetty',
-            'description' => 'Rocky jetty with good dawn bites.',
-            'latitude' => 36.85,
-            'longitude' => -6.35,
+            'name' => 'Valletta Breakwater',
+            'description' => 'Outer breakwater near the harbor mouth, great at sunrise.',
+            'country' => 'Malta',
+            'city' => 'Valletta',
+            'latitude' => 35.8989,
+            'longitude' => 14.5146,
         ]);
 
         $spot2 = FishingSpot::create([
             'user_id' => $friend->id,
-            'name' => 'Lake Point',
-            'description' => 'Shaded point, best at dusk.',
-            'latitude' => 45.42,
-            'longitude' => -75.69,
+            'name' => 'Marsaxlokk Harbour',
+            'description' => 'Calm bay with traditional luzzu boats and night bites.',
+            'country' => 'Malta',
+            'city' => 'Marsaxlokk',
+            'latitude' => 35.8415,
+            'longitude' => 14.5449,
         ]);
 
         $catchA = CatchLog::create([
             'user_id' => $demo->id,
             'fishing_spot_id' => $spot1->id,
-            'species' => 'Bass',
-            'weight_kg' => 2.1,
-            'length_cm' => 45,
-            'depth_m' => 4,
+            'species' => 'Lampuki (Mahi-mahi)',
+            'weight_kg' => 3.4,
+            'length_cm' => 62,
+            'depth_m' => 8,
             'visibility' => 'public',
-            'notes' => 'Hit a crankbait near rocks.',
+            'notes' => 'Trolled a feather near the breakwater.',
         ]);
 
         $catchB = CatchLog::create([
             'user_id' => $friend->id,
             'fishing_spot_id' => $spot2->id,
-            'species' => 'Trout',
-            'weight_kg' => 1.3,
-            'length_cm' => 38,
-            'depth_m' => 3,
+            'species' => 'Amberjack',
+            'weight_kg' => 5.2,
+            'length_cm' => 70,
+            'depth_m' => 12,
             'visibility' => 'friends',
-            'notes' => 'Evening bite on spoon.',
+            'notes' => 'Live bait near the drop-off.',
         ]);
 
         Comment::create([
             'user_id' => $friend->id,
             'catch_log_id' => $catchA->id,
-            'content' => 'Nice bass! What lure?',
+            'content' => 'Great Lampuki! Which feather color?',
         ]);
 
         Comment::create([
             'user_id' => $demo->id,
             'catch_log_id' => $catchB->id,
-            'content' => 'Great trout spot!',
+            'content' => 'Solid amberjack—nice catch!',
         ]);
 
         // Basic follow relationships so "Friends" filter shows data

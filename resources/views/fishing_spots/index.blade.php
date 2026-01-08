@@ -13,6 +13,9 @@
                 <div class="card h-100">
                     <div class="card-body">
                         <h5 class="card-title">{{ $spot->name }}</h5>
+                        <p class="card-text mb-1">
+                            <strong>{{ $spot->city ?? 'City N/A' }}</strong>, {{ $spot->country ?? 'Country N/A' }}
+                        </p>
                         <p class="card-text">{{ $spot->description ?? 'No description provided.' }}</p>
                         <p class="card-text">
                             <small class="text-muted">

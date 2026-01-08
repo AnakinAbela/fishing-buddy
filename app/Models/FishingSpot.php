@@ -13,6 +13,8 @@ class FishingSpot extends Model
         'user_id',
         'name',
         'description',
+        'country',
+        'city',
         'latitude',
         'longitude',
     ];

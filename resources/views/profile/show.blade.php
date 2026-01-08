@@ -6,6 +6,16 @@
 
     @if(auth()->id() === $user->id)
         <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary btn-sm">Edit Profile</a>
+    @else
+        <form action="{{ route('follow.toggle', $user) }}" method="POST">
+            @csrf
+            @php
+                $isFollowing = auth()->check() && auth()->user()->following->contains('id', $user->id);
+            @endphp
+            <button class="btn btn-sm {{ $isFollowing ? 'btn-success' : 'btn-outline-success' }}">
+                {{ $isFollowing ? 'Unfollow' : 'Follow' }}
+            </button>
+        </form>
     @endif
 </div>
 
@@ -14,6 +24,33 @@
 <div class="d-flex gap-3 mb-4">
     <div><strong>{{ $user->followers->count() }}</strong> followers</div>
     <div><strong>{{ $user->following->count() }}</strong> following</div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h6>Followers</h6>
+        @if($user->followers->count())
+            <ul class="list-unstyled mb-0">
+                @foreach($user->followers as $follower)
+                    <li class="text-muted small">{{ $follower->name }}</li>
+                @endforeach
+            </ul>
+        @else
+            <p class="text-muted small mb-0">No followers yet.</p>
+        @endif
+    </div>
+    <div class="col-md-6">
+        <h6>Following</h6>
+        @if($user->following->count())
+            <ul class="list-unstyled mb-0">
+                @foreach($user->following as $followed)
+                    <li class="text-muted small">{{ $followed->name }}</li>
+                @endforeach
+            </ul>
+        @else
+            <p class="text-muted small mb-0">Not following anyone.</p>
+        @endif
+    </div>
 </div>
 
 @if($user->catches->count())
