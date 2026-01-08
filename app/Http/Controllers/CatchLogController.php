@@ -47,6 +47,8 @@ class CatchLogController extends Controller
 
     public function show(CatchLog $catch)
     {
+        $catch->load(['user', 'fishingSpot', 'comments.user', 'likes']);
+
         return view('catches.show', compact('catch'));
     }
 

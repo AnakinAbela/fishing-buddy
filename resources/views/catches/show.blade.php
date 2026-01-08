@@ -46,7 +46,27 @@
 
 <hr>
 
-{{-- ================= COMMENTS SECTION ================= --}}
+@php
+    $likeCount = $catch->likes->count();
+    $userHasLiked = auth()->check() && $catch->likes->contains('user_id', auth()->id());
+@endphp
+
+<div class="d-flex align-items-center gap-2 mb-4">
+    @auth
+        <form action="{{ route('likes.toggle', $catch) }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-sm {{ $userHasLiked ? 'btn-primary' : 'btn-outline-primary' }}">
+                {{ $userHasLiked ? 'Unlike' : 'Like' }}
+            </button>
+        </form>
+    @else
+        <a href="{{ route('login') }}" class="btn btn-sm btn-outline-primary">Login to like</a>
+    @endauth
+
+    <span class="text-muted small">
+        {{ $likeCount }} {{ $likeCount === 1 ? 'like' : 'likes' }}
+    </span>
+</div>
 
 <h4>Comments</h4>
 
