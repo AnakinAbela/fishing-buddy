@@ -82,7 +82,6 @@ class DemoSeeder extends Seeder
             'content' => 'Solid amberjack—nice catch!',
         ]);
 
-        // Basic follow relationships so "Friends" filter shows data
         Follow::create([
             'follower_id' => $demo->id,
             'followed_id' => $friend->id,
